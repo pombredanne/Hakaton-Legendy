@@ -1,0 +1,49 @@
+		Estymata liczby legend miejskich
+	
+	Źródła legend miejskich
+
+Metodologia
+
+A) Na niektórych stronach internetowych (dmoz, atrapa.net) jest napisane, ile liczby sobie zbiór legend.
+B) Z niektórych stron (Urban legends online, Wikipedia category) trzeba było wyciągnąć liczbę legend poprzez skopiowanie listy legend i stwierdzenie, ile jest wierszy. W przypadku Urban legends online z pewnością jest dużo powtórzeń.
+C) Książki - albo w tytule jest określone, ile legend opisuje dana pozycja, albo w opisie, recenzji książki jest to wyspecyfikowane. Jeśli nie, to można to oszacować po liczbie stron (oczywiście są to bardzo niedokładne szacunki).
+D) snopes.com -> pobrałem stronę wgetem.
+Polecenie pobierające serwis:
+Total wall clock time: 17m 32s
+Downloaded: 5851 files, 134M in 3m 31s (650 KB/s)
+Mamy 6k plików. Powiedzmy, że 7-15% z tego, to legendy (ale czy niepowtarzalne?...). Tak więc około 500-1000 legend
+
+	Estymata
+
+Średnia estymat: 304.
+Biorąc pod uwagę "najbardziej wartościowe" pozycje (książki, strony), możemy oczekiwać,
+że będziemy w stanie odnaleźć około 100-500 legend miejskich, bliżej 200-300.
+Ile linków z legendami można zindeksować?
+	
+	Zapytania do wyszukiwarek
+
+Zapytania do Google
+
+1. Zapytanie "urban legend":
+Około 33,700,000 wyników (0,34 s)
+
+2. Zapytanie "legenda miejska":
+Około 1,060,000 wyników (0,19 s)
+
+Zapytania do Bing
+
+1. urban legends:
+7 740 000 results
+
+język polski polski:
+2. legendy miejskie: 90 500 results
+3. legenda miejska: 122 000 results
+Synteza
+
+Ogólnie dla języka angielskiego dostajemy około 7 - 33 milionów wyników,
+a dla języka polskiego około 100 tysięcy do 1 miliona wyników.
+
+		Estymata
+
+Powiedzmy, że mamy 200 serwisów z legendami miejskimi, każda z nich ma średnio 300 legend.
+W sumie dostajemy około 60 000 linków z legendami.
