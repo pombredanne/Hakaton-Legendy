@@ -7,6 +7,10 @@ import nltk
 """ Sortowanie słownika """
 import operator
 
+""" Dostęp do katalogów, plików """
+import os
+from os import listdir
+from os.path import isfile, join
 
 class QueryGenerator:
     """ Generuje zbiór zapytań na podstawie tekstu legendy. """
@@ -21,6 +25,8 @@ class QueryGenerator:
         self.lemmas = lemmas
             
         self.garbage_words = self.generate_list_of_garbage_words()
+        
+        self.corpus_dir = os.path.abspath('legends')
             
     def lemmatise(self, legend_toks_list):
         """ Sprowadza tekst legendy do postaci zlematyzowanej. 
@@ -110,8 +116,28 @@ class QueryGenerator:
                 break
             
         return rares
+
+    
+    def number_of_legends_in_corpus(self):
+        """ Liczy legendy w korpusie. """
         
-    def find_keywords(self, rare_words, corpus_dir):
+        files = [ f for f in listdir(self.corpus_dir) 
+                 if isfile(join(self.corpus_dir, f)) ]
+    
+        legends_num = 0
+    
+        prefixes = set()
+        
+        for f in files:
+            chunks = f.split('_');
+            if chunks[0] not in prefixes:
+                prefixes.add(chunks[0])
+                legends_num = legends_num + 1
+        
+        return legends_num
+    
+        
+    def find_keywords(self, rare_words):
         """ Wyszukuje słowa kluczowe zawarte w rare_keywords, takie, które
         występują w tekstach (plikach) w katalogu corpus_dir. """
     

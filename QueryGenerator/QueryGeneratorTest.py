@@ -123,6 +123,29 @@ class Task206Test(unittest.TestCase):
         rares_gen = generator.find_rare_words(lemmatized_legend_list)
         
         self.failUnlessEqual(rares, rares_gen)
+        
+
+    def testLegendsNum(self):
+        """ Sprawdza poprawność liczenia liczby legend. """
+        
+        frequencies = {u'mieć': 0.012}
+        lemmas = {u'kosmici' : u'kosmita'}
+        
+        generator = QueryGenerator(frequencies, lemmas)
+        
+        legends_num_ref = 9
+        
+        legends_num_gen = generator.number_of_legends_in_corpus()
+        
+        self.failUnlessEqual(legends_num_ref, legends_num_gen)
+        
+    
+    def testKeywords(self):
+        """ Sprawdza poprawność znajdowania słów kluczowych. """
+        
+        lemmatized_legend_list = [u'babcia',
+            u'mieć', u'kot', u'śmierć', u'w', u'autostopowicz',
+            u'student', u'narty', u'impreza', u'schody']
 
 
 if __name__ == '__main__':
