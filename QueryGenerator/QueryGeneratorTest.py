@@ -12,7 +12,27 @@ from QueryGenerator import QueryGenerator
 class Task206Test(unittest.TestCase):
     """ Testy do generatora zapytań. """
     
-    def testToks(self):
+    def testToksNoUnicode(self):
+        """ Prosty test tokenizacji. BEZ UNICODE. """
+        
+        legenda = u'Moja babcia ma bardzo dużo lat. Hola!'
+        legenda = legenda + u' podaj herbatę mi.'
+        
+        tokens_ref = [u'Moja', u'babcia', u'ma', u'bardzo',
+                      u'dużo', u'lat', u'Hola',
+                      u'podaj', u'herbatę', u'mi']
+        
+        frequencies = {u'mieć': 0.012}
+        lemmas = {u'kosmici' : u'kosmita'}
+        
+        generator = QueryGenerator(frequencies, lemmas)
+        
+        gen_tokens = generator.toks(legenda)
+        
+        self.failUnlessEqual(tokens_ref, gen_tokens)
+        
+    
+    def testToksUnicode(self):
         """ Sprawdza tokenizację. """
         legenda = 'Moja babcia ma bardzo dużo lat. Hola! Powiedziała babcia mi.'
        # legenda = legenda.decode('utf-8')
@@ -23,10 +43,9 @@ class Task206Test(unittest.TestCase):
       #  for t in tokens:
       #      t = t.decode('utf-8')
         
-        frequencies = {
-            u'mieć': 0.012}
-        lemmas = {u'kosmici' : u'kosmita',
-                  u'mi' : u'mi'}
+        frequencies = {u'mieć': 0.012}
+        lemmas = {u'kosmici' : u'kosmita'}
+        
         generator = QueryGenerator(frequencies, lemmas)
         
         gen_tokens = generator.toks(legenda)
