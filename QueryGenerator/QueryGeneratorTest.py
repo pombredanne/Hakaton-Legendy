@@ -37,8 +37,8 @@ class Task206Test(unittest.TestCase):
         legenda = 'Moja babcia ma bardzo dużo lat. Hola! Powiedziała babcia mi.'
        # legenda = legenda.decode('utf-8')
         
-        tokens = ['Moja', 'babcia', 'ma', 'bardzo', 
-                    'dużo', 'lat', 'Hola', 
+        tokens = ['Moja', 'babcia', 'ma', 'bardzo',
+                    'dużo', 'lat', 'Hola',
                     'Powiedziała', 'babcia', 'mi' ]
       #  for t in tokens:
       #      t = t.decode('utf-8')
@@ -56,8 +56,8 @@ class Task206Test(unittest.TestCase):
     def testLemmatization(self):
         """ Sprawdza poprawność lematyzacji. """
         
-        tokens = [u'Moja', u'babcia', u'ma', u'bardzo', 
-                    u'dużo', u'lat', u'Hola', 
+        tokens = [u'Moja', u'babcia', u'ma', u'bardzo',
+                    u'dużo', u'lat', u'Hola',
                     u'Powiedziała', u'babcia', u'mi' ]
         
         lemmatized_ref = [u'moje', u'babcia', u'mieć', u'bardzo',
@@ -78,11 +78,31 @@ class Task206Test(unittest.TestCase):
         
         self.failUnlessEqual(lemmatized_ref, lemmatized_gen)
         
+        
+    def testStripGarbage(self):
+        """ Sprawdza poprawność usuwania słów-śmieci. """
+        
+        lemmatized_legend_list = [u'babcia',
+            u'mieć', u'kot', u'śmierć', u'w',
+            u'hehe', u'prawdziwy', u'autostopowicz']
+        
+        frequencies = {u'mieć': 0.012}
+        lemmas = {u'kosmici' : u'kosmita'}
+        
+        generator = QueryGenerator(frequencies, lemmas)
+        
+        legend_garbage_free_ref = [u'babcia',
+            u'kot', u'śmierć', u'autostopowicz']
+        
+        legend_garbage_free_gen = generator.strip_garbage(lemmatized_legend_list)
+        
+        self.failUnlessEqual(legend_garbage_free_ref, legend_garbage_free_gen)
+        
 
     def testRareWords(self):
         """ Sprawdza poprawność znajdowania rzadkich słów. """
         
-        lemmatized_legend_list = [u'babcia', 
+        lemmatized_legend_list = [u'babcia',
             u'mieć', u'kot', u'śmierć', u'w', u'autostopowicz']
         
         frequencies = {

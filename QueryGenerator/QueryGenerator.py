@@ -20,6 +20,7 @@ class QueryGenerator:
         self.frequencies = frequencies
         self.lemmas = lemmas
             
+        self.garbage_words = self.generate_list_of_garbage_words()
             
     def lemmatise(self, legend_toks_list):
         """ Sprowadza tekst legendy do postaci zlematyzowanej. 
@@ -35,6 +36,19 @@ class QueryGenerator:
                 lemmatized.append(tok_low)
                 
         return lemmatized
+    
+    def strip_garbage(self, lemmatized_legend_test):
+        """ Usuwa z listy słów zlematyzowanych, słowa-śmieci, np. 'haha',
+        'hehe', 'historia', 'prawdziwa', czyli takie, które pojawiają
+        się w co drugiej legendzie. """
+        
+        garbage_free = []
+        
+        for word in lemmatized_legend_test:
+            if word not in self.garbage_words:
+                garbage_free.append(word)
+                
+        return garbage_free
         
     
     def toks(selfs, legend):
@@ -53,7 +67,7 @@ class QueryGenerator:
         
         return nltk.regexp_tokenize(legend, p3)
         
-        #return nltk.word_tokenize(legend)
+        # return nltk.word_tokenize(legend)
     
     def generate_queries(self, legend, corpus_dir):
         """ Generuje zbiór list będących zapytaniami do wyszukiwarek. """
@@ -101,3 +115,15 @@ class QueryGenerator:
         """ Wyszukuje słowa kluczowe zawarte w rare_keywords, takie, które
         występują w tekstach (plikach) w katalogu corpus_dir. """
     
+    def generate_list_of_garbage_words(self):
+        """ Generuje słowa-śmieci, np. 'haha',
+        'hehe', 'historia', 'prawdziwa', czyli takie, które pojawiają
+        się w co drugiej legendzie. """
+        
+        garbage_words = {
+        u'haha', u'hehe', u'prawdziwy', u'prawda', u'kolega', u'koleżanka',
+        u'znajomy', u'przydażać', u'przydarzać', u'przydarzyła', u'kumpel',
+        u'historia', u'mieć', u'w', u'hehe', u'prawdziwy',
+        }
+        
+        return garbage_words
