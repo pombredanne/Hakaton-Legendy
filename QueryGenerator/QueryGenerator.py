@@ -1,7 +1,12 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+""" Przetwarzanie języka """
 import nltk
+
+""" Sortowanie słownika """
+import operator
+
 
 class QueryGenerator:
     """ Generuje zbiór zapytań na podstawie tekstu legendy. """
@@ -56,10 +61,41 @@ class QueryGenerator:
         
         
         
-    def find_rare_words(self, lemmatized_text):
+    def find_rare_words(self, lemmatized_legend_list):
         """ Wyszukuje rzadkowystępujące (w j. polskim) słowa zawarte
-        w tekście (stringu) lemmatized_text. """
+        w liście słów lemmatized_legend_list. 
+        Zwraca listę rzadkich słów, w kolejności od najrzadszych. """
         
+        """ Uwzględni słowa o częstotliwości mniejszej niż rare_treshold. """
+        rare_treshold = 0.001
+        
+        """ Znajdzie co najwyzej max_rares rzadkich słów. """
+        max_rares = 12
+        
+        freqs = dict()
+        
+        """ Mapowanie słów legendy do częstotliwości występowania w j. pl: """
+        for word in lemmatized_legend_list:
+            if self.frequencies.has_key(word):
+                freqs[word] = self.frequencies[word]
+            else:
+                freqs[word] = 0.0
+        
+        """ Sortowanie słów po częstotliwości ich występowania """
+        """ list of tuples sorted by the second element in each tuple. """
+        sorted_words = sorted(freqs.iteritems(), key=operator.itemgetter(1))
+          
+        """ Ostateczna lista rzadkich słów """
+        rares = []
+        
+        for key in sorted_words:
+            if key[1] < rare_treshold:
+                rares.append(key[0])
+            
+            if len(rares) == max_rares:
+                break
+            
+        return rares
         
     def find_keywords(self, rare_words, corpus_dir):
         """ Wyszukuje słowa kluczowe zawarte w rare_keywords, takie, które

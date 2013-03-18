@@ -82,7 +82,8 @@ class Task206Test(unittest.TestCase):
     def testRareWords(self):
         """ Sprawdza poprawność znajdowania rzadkich słów. """
         
-        lemmatized_text = u'babcia mieć kot śmierć w autostopowicz'
+        lemmatized_legend_list = [u'babcia', 
+            u'mieć', u'kot', u'śmierć', u'w', u'autostopowicz']
         
         frequencies = {
             u'mieć': 0.012,
@@ -95,12 +96,11 @@ class Task206Test(unittest.TestCase):
         
         lemmas = {u'kosmici' : u'kosmita',
                   u'mi' : u'mi'}
-        
-        rares = {u'autostopowicz', u'śmierć'}
+        rares = [u'śmierć', u'autostopowicz', u'kot']
         
         generator = QueryGenerator(frequencies, lemmas)
         
-        rares_gen = generator.find_rare_words(lemmatized_text)
+        rares_gen = generator.find_rare_words(lemmatized_legend_list)
         
         self.failUnlessEqual(rares, rares_gen)
 
