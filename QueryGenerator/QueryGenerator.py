@@ -22,6 +22,9 @@ from InvertedIndex.SimpleIndex import SimpleIndex
 from InvertedIndex.Task201 import add_document
 from InvertedIndex.Task206 import cosine_score
 
+""" Do losowego wyciągania elementów ze zbiorów """
+import random
+
 class QueryGenerator:
     """ Generuje zbiór zapytań na podstawie tekstu legendy. """
     
@@ -98,21 +101,64 @@ class QueryGenerator:
             words.append(word.lower())
             
         return words
+    
+    def random_words(self, set_of_words, number_of_elements):
+        """ Wyciąga number_of_elements elementów z set_of_words. """
         
+        num = number_of_elements
+        if number_of_elements > len(set_of_words):
+            num = len(set_of_words)
+        
+        return random.sample(set_of_words, num)    
+    
     
     def generate_queries(self, legend):
         """ Generuje zbiór list będących zapytaniami do wyszukiwarek. """
         
         """ Podstawowy preprocessing """
-        tokens = toks(self, legend)
+        #print "\nGenerowanie zapytania..."
+        tokens = self.toks(legend)
+        #print "\nTokens: "
+        #print tokens
         lemmatized_legend_list = self.lemmatise(tokens)
+        #print "\nLemmatized: "
+        #print lemmatized_legend_list
         garbage_free = self.strip_garbage(lemmatized_legend_list)
+        #print "\nGarbage free: "
+        #print garbage_free
         
         """ Rzadkie słowa oraz słowa kluczowe """
-        rare_words = self.find_rare_words(lemmatized_legend_list)
+        rare_words = self.find_rare_words(garbage_free)
+        #print "\nRare words: "
+        #print rare_words
         keywords = self.keywords(lemmatized_legend_list, rare_words)
+        #print "\nKeywords: "
+        #print keywords
         
+        """ Lista zapytań - list słów """
+        queries = []
         
+        """ Pierwsza lista to słowa kluczowe """
+        query1 = keywords
+        queries.append(query1)
+        
+        """ Kolejne zapytania to kilka losowych elementów ze zbioru
+            słów kluczowycy + kilka elementów typowo "legendowych",
+            tj. "historia", "koleżanka" - wskazujących na to, że
+            mamy do czynienia z historią. """
+        
+        for i in range(9):
+            story_words_num = random.randint(1, 3)
+            query = self.random_words(self.story_words, story_words_num)
+            keywords_words_num = random.randint(2, 5)
+            k_words = self.random_words(keywords, keywords_words_num)
+            
+            for k in k_words:
+                query.append(k)
+                
+            queries.append(query)
+        
+        return queries
         
         
     def find_rare_words(self, lemmatized_legend_list):
@@ -133,11 +179,15 @@ class QueryGenerator:
             if self.frequencies.has_key(word):
                 freqs[word] = self.frequencies[word]
             else:
-                freqs[word] = 0.0
+                freqs[word] = 0
+                
+        #print "\nfreqs: "
+        #print freqs
         
         """ Sortowanie słów po częstotliwości ich występowania """
         """ list of tuples sorted by the second element in each tuple. """
-        sorted_words = sorted(freqs.iteritems(), key=operator.itemgetter(1))
+        sorted_words = sorted(freqs.iteritems(),
+            key=operator.itemgetter(1), reverse=True)
           
         """ Ostateczna lista rzadkich słów """
         rares = []
@@ -146,7 +196,7 @@ class QueryGenerator:
             if key[1] < rare_treshold:
                 rares.append(key[0])
             
-            if len(rares) == max_rares:
+            if len(rares) >= max_rares:
                 break
             
         return rares
@@ -194,7 +244,9 @@ class QueryGenerator:
            u'przydarzyła', u'znajomy', u'kumpel', u'historia',
            u'prawdziwy', u'prawda', u'kolega', u'koleżanka',
            u'opowiedzieć'
-           } 
+        }
+        
+        return story_words 
     
     def generate_list_of_garbage_words(self):
         """ Generuje słowa-śmieci, np. 'haha',
@@ -202,7 +254,7 @@ class QueryGenerator:
         się w co drugiej legendzie. """
         
         garbage_words = {
-            u'haha', u'hehe',
+            u'haha', u'hehe', u'bardzo', u'dużo',
             u'mieć', u'w', u'hehe', u'prawdziwy',
         }
         
