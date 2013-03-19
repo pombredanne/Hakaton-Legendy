@@ -18,8 +18,8 @@ class Task206Test(unittest.TestCase):
         legenda = u'Moja babcia ma bardzo dużo lat. Hola!'
         legenda = legenda + u' podaj herbatę mi.'
         
-        tokens_ref = [u'Moja', u'babcia', u'ma', u'bardzo',
-                      u'dużo', u'lat', u'Hola',
+        tokens_ref = [u'moja', u'babcia', u'ma', u'bardzo',
+                      u'dużo', u'lat', u'hola',
                       u'podaj', u'herbatę', u'mi']
         
         frequencies = {u'mieć': 0.012}
@@ -34,12 +34,13 @@ class Task206Test(unittest.TestCase):
     
     def testToksUnicode(self):
         """ Sprawdza tokenizację. """
+    
         legenda = 'Moja babcia ma bardzo dużo lat. Hola! Powiedziała babcia mi.'
        # legenda = legenda.decode('utf-8')
         
-        tokens = ['Moja', 'babcia', 'ma', 'bardzo',
-                    'dużo', 'lat', 'Hola',
-                    'Powiedziała', 'babcia', 'mi' ]
+        tokens = ['moja', 'babcia', 'ma', 'bardzo',
+                    'dużo', 'lat', 'hola',
+                    'powiedziała', 'babcia', 'mi' ]
       #  for t in tokens:
       #      t = t.decode('utf-8')
         
@@ -145,8 +146,23 @@ class Task206Test(unittest.TestCase):
         
         lemmatized_legend_list = [u'babcia',
             u'mieć', u'kot', u'śmierć', u'w', u'autostopowicz',
-            u'student', u'narty', u'impreza', u'schody']
-
+            u'student', u'narty', u'impreza', u'schody', u'w',
+            u'mieć', u'student', u'narty', u'narty', u'student']
+        
+        rare_words = [u'babcia', u'autostopowicz', u'student',
+            u'narty']
+        
+        keywords_ref = {u'student', u'narty'}
+        
+        frequencies = {u'mieć': 0.012}
+        lemmas = {u'kosmici' : u'kosmita'}
+        
+        generator = QueryGenerator(frequencies, lemmas)
+        
+        keywords_gen = generator.keywords(lemmatized_legend_list, rare_words)
+        
+        self.failUnlessEqual(keywords_ref, keywords_gen)
+        
 
 if __name__ == '__main__':
     unittest.main()

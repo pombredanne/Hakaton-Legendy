@@ -3,6 +3,7 @@
 
 """ Przetwarzanie języka """
 import nltk
+import re
 
 """ Sortowanie słownika """
 import operator
@@ -11,6 +12,15 @@ import operator
 import os
 from os import listdir
 from os.path import isfile, join
+import fnmatch
+
+""" Czytanie plików """
+import fileinput
+
+""" Odwrócony indeks, tf-idf """
+from InvertedIndex.SimpleIndex import SimpleIndex
+from InvertedIndex.Task201 import add_document
+from InvertedIndex.Task206 import cosine_score
 
 class QueryGenerator:
     """ Generuje zbiór zapytań na podstawie tekstu legendy. """
@@ -26,7 +36,11 @@ class QueryGenerator:
             
         self.garbage_words = self.generate_list_of_garbage_words()
         
+        self.story_words = self.generate_list_of_story_words()
+        
         self.corpus_dir = os.path.abspath('legends')
+        
+        self.index = SimpleIndex(dict(), dict())
             
     def lemmatise(self, legend_toks_list):
         """ Sprowadza tekst legendy do postaci zlematyzowanej. 
@@ -48,6 +62,10 @@ class QueryGenerator:
         'hehe', 'historia', 'prawdziwa', czyli takie, które pojawiają
         się w co drugiej legendzie. """
         
+        return [ word for word in lemmatized_legend_test
+                if not word in self.garbage_words]
+        
+        """
         garbage_free = []
         
         for word in lemmatized_legend_test:
@@ -55,9 +73,9 @@ class QueryGenerator:
                 garbage_free.append(word)
                 
         return garbage_free
-        
+        """
     
-    def toks(selfs, legend):
+    def toks(self, legend):
         """ Tokenizuje tekst legendy. """
         # tokens = nltk.word_tokenize(legend)
         pattern = r'''(?x)
@@ -66,18 +84,34 @@ class QueryGenerator:
            | \w+(-\w+)*        
            | \$?\d+(\.\d+)?%?  
            | [][.,;"'?():-_`]'''
+        # return nltk.regexp_tokenize(legend, p3)
         
         p2 = r'(?x)\w+'
         
         p3 = r'\w+'
         
-        return nltk.regexp_tokenize(legend, p3)
+        re_word = re.compile(r'(\w+)', re.UNICODE)
         
-        # return nltk.word_tokenize(legend)
+        words = []
+        
+        for word in re.findall(re_word, legend):
+            words.append(word.lower())
+            
+        return words
+        
     
-    def generate_queries(self, legend, corpus_dir):
+    def generate_queries(self, legend):
         """ Generuje zbiór list będących zapytaniami do wyszukiwarek. """
+        
+        """ Podstawowy preprocessing """
         tokens = toks(self, legend)
+        lemmatized_legend_list = self.lemmatise(tokens)
+        garbage_free = self.strip_garbage(lemmatized_legend_list)
+        
+        """ Rzadkie słowa oraz słowa kluczowe """
+        rare_words = self.find_rare_words(lemmatized_legend_list)
+        keywords = self.keywords(lemmatized_legend_list, rare_words)
+        
         
         
         
@@ -136,10 +170,31 @@ class QueryGenerator:
         
         return legends_num
     
+    def keywords(self, lemmatized_legend_text, legend_rare_words):
+        """ Generuje zbiór słów kluczowych danej legendy.
+        lemmatized_legend_text - lista zlematyzowanych, 
+        odśmiecionych (po przebiegu metody strip_garbage) "lemów.
+        legend_rare_words - lista rzadkich słów występujących
+        w legendzie (stworzona metodą find_rare_words). 
+        """
         
-    def find_keywords(self, rare_words):
-        """ Wyszukuje słowa kluczowe zawarte w rare_keywords, takie, które
-        występują w tekstach (plikach) w katalogu corpus_dir. """
+        frequency_dist = nltk.FreqDist(lemmatized_legend_text)
+        
+        # print frequency_dist
+        
+        return {w for (w, freq) in frequency_dist.items() 
+                if freq > 2 and w in legend_rare_words}
+        
+    def generate_list_of_story_words(self):
+        """ Generuje listę słów, które pojawiają się w wielu
+        legendach, np. 'historia'. """
+        
+        story_words = {
+           u'historia', u'przyda', u'przydażać', u'przydarzać',
+           u'przydarzyła', u'znajomy', u'kumpel', u'historia',
+           u'prawdziwy', u'prawda', u'kolega', u'koleżanka',
+           u'opowiedzieć'
+           } 
     
     def generate_list_of_garbage_words(self):
         """ Generuje słowa-śmieci, np. 'haha',
@@ -147,9 +202,8 @@ class QueryGenerator:
         się w co drugiej legendzie. """
         
         garbage_words = {
-        u'haha', u'hehe', u'prawdziwy', u'prawda', u'kolega', u'koleżanka',
-        u'znajomy', u'przydażać', u'przydarzać', u'przydarzyła', u'kumpel',
-        u'historia', u'mieć', u'w', u'hehe', u'prawdziwy',
+            u'haha', u'hehe',
+            u'mieć', u'w', u'hehe', u'prawdziwy',
         }
         
         return garbage_words
