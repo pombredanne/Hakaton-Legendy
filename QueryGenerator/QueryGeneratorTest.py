@@ -1,6 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+__author__ = "Bartosz Kosowski"
+__date__ = "$March 23, 2012"
+
 import unittest
 
 """
@@ -9,7 +12,21 @@ Testuje działanie generatora zapytań.
 
 from QueryGenerator import QueryGenerator
 
-class Task206Test(unittest.TestCase):
+lemmas = {u'kosmici' : u'kosmita',
+                u'ma' : u'mieć',
+                  u'podaj' : u'podać',
+                  u'herbatę' : u'herbata',
+                  u'mi' : u'ja',
+                  u'studenci' : u'student',
+                  u'studencie' : u'student',
+                  u'moja' : u'moje',
+                  u'ma' : u'mieć',
+                  u'powiedziała' : u'powiedzieć'
+        }
+
+generator = QueryGenerator(lemmas)
+
+class QueryGeneratorTest(unittest.TestCase):
     """ Testy do generatora zapytań. """
     
     def testToksNoUnicode(self):
@@ -22,11 +39,6 @@ class Task206Test(unittest.TestCase):
                       u'dużo', u'lat', u'hola',
                       u'podaj', u'herbatę', u'mi']
         
-        frequencies = {u'mieć': 0.012}
-        lemmas = {u'kosmici' : u'kosmita'}
-        
-        generator = QueryGenerator(frequencies, lemmas)
-        
         gen_tokens = generator.toks(legenda)
         
         self.failUnlessEqual(tokens_ref, gen_tokens)
@@ -35,19 +47,18 @@ class Task206Test(unittest.TestCase):
     def testToksUnicode(self):
         """ Sprawdza tokenizację. """
     
-        legenda = 'Moja babcia ma bardzo dużo lat. Hola! Powiedziała babcia mi.'.encode('utf-8')
-       # legenda = legenda.decode('utf-8')
+        legenda = unicode('Moja babcia ma bardzo dużo lat. ' \
+            'Hola! Powiedziała babcia mi.', "UTF-8")
         
-        tokens = ['moja', 'babcia', 'ma', 'bardzo',
+        tokens_a = ['moja', 'babcia', 'ma', 'bardzo',
                     'dużo', 'lat', 'hola',
-                    'powiedziała'.encode('utf-8'), 'babcia', 'mi' ]
-      #  for t in tokens:
-      #      t = t.decode('utf-8')
+                    'powiedziała', 'babcia', 'mi' ]
         
-        frequencies = {u'mieć': 0.012}
-        lemmas = {u'kosmici' : u'kosmita'}
+        tokens = []
         
-        generator = QueryGenerator(frequencies, lemmas)
+        for t in tokens_a:
+            t = unicode(t, "UTF-8")
+            tokens.append(t)
         
         gen_tokens = generator.toks(legenda)
         
@@ -65,16 +76,6 @@ class Task206Test(unittest.TestCase):
                           u'dużo', u'lat', u'hola', u'powiedzieć',
                           u'babcia', u'ja']
         
-        frequencies = {
-            u'mieć': 0.012}
-        lemmas = {u'kosmici' : u'kosmita',
-                  u'mi' : u'ja',
-                  u'moja' : u'moje',
-                  u'ma' : u'mieć',
-                  u'powiedziała' : u'powiedzieć'}
-        
-        generator = QueryGenerator(frequencies, lemmas)
-        
         lemmatized_gen = generator.lemmatise(tokens)
         
         self.failUnlessEqual(lemmatized_ref, lemmatized_gen)
@@ -87,11 +88,6 @@ class Task206Test(unittest.TestCase):
             u'mieć', u'kot', u'śmierć', u'w',
             u'hehe', u'prawdziwy', u'autostopowicz']
         
-        frequencies = {u'mieć': 0.012}
-        lemmas = {u'kosmici' : u'kosmita'}
-        
-        generator = QueryGenerator(frequencies, lemmas)
-        
         legend_garbage_free_ref = [u'babcia',
             u'kot', u'śmierć', u'autostopowicz']
         
@@ -103,24 +99,10 @@ class Task206Test(unittest.TestCase):
     def testRareWords(self):
         """ Sprawdza poprawność znajdowania rzadkich słów. """
         
-        lemmatized_legend_list = [u'babcia',
+        lemmatized_legend_list = [u'babcia', u'olaboga',
             u'mieć', u'kot', u'śmierć', u'w', u'autostopowicz']
         
-        frequencies = {
-            u'mieć': 0.012,
-            u'kot': 0.0003,
-            u'babcia': 0.006,
-            u'autostopowicz': 0.00005,
-            u'śmierć': 0.00002,
-            u'w' : 0.005
-            }
-        
-        lemmas = {u'kosmici' : u'kosmita',
-                  u'mi' : u'mi'}
-        
-        rares = [u'kot', u'autostopowicz', u'śmierć']
-        
-        generator = QueryGenerator(frequencies, lemmas)
+        rares = [u'autostopowicz', u'olaboga', u'mieć']
         
         rares_gen = generator.find_rare_words(lemmatized_legend_list)
         
@@ -129,11 +111,6 @@ class Task206Test(unittest.TestCase):
 
     def testLegendsNum(self):
         """ Sprawdza poprawność liczenia liczby legend. """
-        
-        frequencies = {u'mieć': 0.012}
-        lemmas = {u'kosmici' : u'kosmita'}
-        
-        generator = QueryGenerator(frequencies, lemmas)
         
         legends_num_ref = 9
         
@@ -155,11 +132,6 @@ class Task206Test(unittest.TestCase):
         
         keywords_ref = {u'student', u'narty'}
         
-        frequencies = {u'mieć': 0.012}
-        lemmas = {u'kosmici' : u'kosmita'}
-        
-        generator = QueryGenerator(frequencies, lemmas)
-        
         keywords_gen = generator.keywords(lemmatized_legend_list, rare_words)
         
         self.failUnlessEqual(keywords_ref, keywords_gen)
@@ -168,34 +140,10 @@ class Task206Test(unittest.TestCase):
     def testGenerateQueriesA(self):
         """ Sprawdza 'tylko' poprawność generowania zapytań. """
         
-        legenda = u'Moja babcia ma bardzo dużo lat. Hola!' \
+        legenda = unicode('Moja babcia ma bardzo dużo lat. Hola!' \
             ' Student! Podaj herbatę mi, studencie!' \
             ' Wy studenci nic byście nie robili. Zły' \
-            ' student, zły! Herbata gdzie jest?! Herbata mówię!' 
-        
-        frequencies = {
-            u'mieć': 0.012,
-            u'kot': 0.0003,
-            u'babcia': 0.006,
-            u'mi' : 0.0043,
-            u'moja' : 0.0012,
-            u'autostopowicz': 0.00005,
-            u'śmierć': 0.00002,
-            u'w' : 0.005,
-            u'herbata' : 0.0000056,
-            u'student' : 0.0000009
-        }
-        
-        lemmas = {u'kosmici' : u'kosmita',
-                  u'ma' : u'mieć',
-                  u'podaj' : u'podać',
-                  u'herbatę' : u'herbata',
-                  u'mi' : u'mi',
-                  u'studenci' : u'student',
-                  u'studencie' : u'student'
-        }
-        
-        generator = QueryGenerator(frequencies, lemmas)
+            ' student, zły! Herbata gdzie jest?! Herbata mówię!', "UTF-8") 
         
         queries = generator.generate_queries(legenda)
         

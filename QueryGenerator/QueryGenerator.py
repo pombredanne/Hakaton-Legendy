@@ -1,6 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+__author__ = "Bartosz Kosowski"
+__date__ = "$March 23, 2012"
+
 """ Przetwarzanie języka """
 import nltk
 import re
@@ -17,24 +20,22 @@ import fnmatch
 """ Czytanie plików """
 import fileinput
 
-""" Odwrócony indeks, tf-idf """
-from InvertedIndex.SimpleIndex import SimpleIndex
-from InvertedIndex.Task201 import add_document
-from InvertedIndex.Task206 import cosine_score
-
 """ Do losowego wyciągania elementów ze zbiorów """
 import random
+
+""" Frekwencjoner - do wyciągania liczby wystąpień tokenów """
+from Frequencer import Frequencer
 
 class QueryGenerator:
     """ Generuje zbiór zapytań na podstawie tekstu legendy. """
     
-    def __init__(self, frequencies, lemmas):
+    def __init__(self, lemmas):
         """Konstruktor. 
             frequencies to słownik {słowo : liczba} częstości występowania
             słów w języku polskim. 
             lemmas to słownik {słowo : słowo_w_postaci_podstawowej}, czyli
             mapowanie ze słów do 'lemów'. """
-        self.frequencies = frequencies
+        self.frequencer = Frequencer()
         self.lemmas = lemmas
             
         self.garbage_words = self.generate_list_of_garbage_words()
@@ -43,8 +44,6 @@ class QueryGenerator:
         
         self.corpus_dir = os.path.abspath('legends')
         
-        self.index = SimpleIndex(dict(), dict())
-            
     def lemmatise(self, legend_toks_list):
         """ Sprowadza tekst legendy do postaci zlematyzowanej. 
             legend_toks_list to lista tokenów legendy. """
@@ -67,16 +66,6 @@ class QueryGenerator:
         
         return [ word for word in lemmatized_legend_test
                 if not word in self.garbage_words]
-        
-        """
-        garbage_free = []
-        
-        for word in lemmatized_legend_test:
-            if word not in self.garbage_words:
-                garbage_free.append(word)
-                
-        return garbage_free
-        """
     
     def toks(self, legend):
         """ Tokenizuje tekst legendy. """
@@ -116,24 +105,24 @@ class QueryGenerator:
         """ Generuje zbiór list będących zapytaniami do wyszukiwarek. """
         
         """ Podstawowy preprocessing """
-        #print "\nGenerowanie zapytania..."
+        # print "\nGenerowanie zapytania..."
         tokens = self.toks(legend)
-        #print "\nTokens: "
-        #print tokens
+        # print "\nTokens: "
+        # print tokens
         lemmatized_legend_list = self.lemmatise(tokens)
-        #print "\nLemmatized: "
-        #print lemmatized_legend_list
+        # print "\nLemmatized: "
+        # print lemmatized_legend_list
         garbage_free = self.strip_garbage(lemmatized_legend_list)
-        #print "\nGarbage free: "
-        #print garbage_free
+        # print "\nGarbage free: "
+        # print garbage_free
         
         """ Rzadkie słowa oraz słowa kluczowe """
         rare_words = self.find_rare_words(garbage_free)
-        #print "\nRare words: "
-        #print rare_words
+        # print "\nRare words: "
+        # print rare_words
         keywords = self.keywords(lemmatized_legend_list, rare_words)
-        #print "\nKeywords: "
-        #print keywords
+        # print "\nKeywords: "
+        # print keywords
         
         """ Lista zapytań - list słów """
         queries = []
@@ -167,22 +156,16 @@ class QueryGenerator:
         Zwraca listę rzadkich słów, w kolejności od najrzadszych. """
         
         """ Uwzględni słowa o częstotliwości mniejszej niż rare_treshold. """
-        rare_treshold = 0.001
+        rare_treshold = 200
         
         """ Znajdzie co najwyzej max_rares rzadkich słów. """
-        max_rares = 12
-        
-        freqs = dict()
+        max_rares = 20
         
         """ Mapowanie słów legendy do częstotliwości występowania w j. pl: """
-        for word in lemmatized_legend_list:
-            if self.frequencies.has_key(word):
-                freqs[word] = self.frequencies[word]
-            else:
-                freqs[word] = 0
+        freqs = self.frequencer.get_frequencies(lemmatized_legend_list)
                 
-        #print "\nfreqs: "
-        #print freqs
+        # print "\nfreqs: "
+        # print freqs
         
         """ Sortowanie słów po częstotliwości ich występowania """
         """ list of tuples sorted by the second element in each tuple. """
@@ -193,6 +176,7 @@ class QueryGenerator:
         rares = []
         
         for key in sorted_words:
+            # print "key %s - %d" %(key[0], key[1])
             if key[1] < rare_treshold:
                 rares.append(key[0])
             
