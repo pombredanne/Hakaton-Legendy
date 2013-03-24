@@ -35,10 +35,10 @@ class LemmatizerTest(unittest.TestCase):
         for word, lem in lemmatized_gen_dict.items():
             lemmatized_gen.add(lem)
         
-        #print "\Original set:"
-        #print lemmatized_ref
-        #print "\Generated set:"
-        #print lemmatized_gen
+        # print "\Original set:"
+        # print lemmatized_ref
+        # print "\Generated set:"
+        # print lemmatized_gen
         
         self.failUnlessEqual(lemmatized_ref, lemmatized_gen)
 

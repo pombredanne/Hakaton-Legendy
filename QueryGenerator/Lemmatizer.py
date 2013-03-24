@@ -1,8 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-__author__="Bartosz Kosowski"
-__date__ ="$March 24, 2013"
+__author__ = "Bartosz Kosowski"
+__date__ = "$March 24, 2013"
 
 """ Do wczytania pliku w utf-8 """
 import codecs
@@ -30,8 +30,8 @@ class Lemmatizer:
         
         for line in self.lems_file:
             line = line.strip()
-            if line =='' or len(line) == 0:
-                 break #koniec pliku
+            if line == '' or len(line) == 0:
+                 break  # koniec pliku
             else:
                 parts = line.split(" ")
                 word = parts[0]
@@ -48,7 +48,8 @@ class Lemmatizer:
             
         lems = dict()
         
-        for token in set(tokens):
+        for tt in set(tokens):
+            token = tt.lower()
             if token in self.lems:
                 lems[token] = self.lems[token]
             else:

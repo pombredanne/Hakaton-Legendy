@@ -26,6 +26,9 @@ import random
 """ Frekwencjoner - do wyciągania liczby wystąpień tokenów """
 from Frequencer import Frequencer
 
+""" Lematyzator - do wyciągania form podstawowych wyrazów """
+from Lemmatizer import Lemmatizer
+
 class QueryGenerator:
     """ Generuje zbiór zapytań na podstawie tekstu legendy. """
     
@@ -36,6 +39,7 @@ class QueryGenerator:
             lemmas to słownik {słowo : słowo_w_postaci_podstawowej}, czyli
             mapowanie ze słów do 'lemów'. """
         self.frequencer = Frequencer()
+        self.lemmatizer = Lemmatizer()
         self.lemmas = lemmas
             
         self.garbage_words = self.generate_list_of_garbage_words()
@@ -48,16 +52,18 @@ class QueryGenerator:
         """ Sprowadza tekst legendy do postaci zlematyzowanej. 
             legend_toks_list to lista tokenów legendy. """
         
+        lems_dict = self.lemmatizer.get_lems(legend_toks_list)
+        
         lemmatized = []
         
         for token in legend_toks_list:
             tok_low = token.lower()
-            if self.lemmas.has_key(tok_low):
-                lemmatized.append(self.lemmas[tok_low])
+            if lems_dict.has_key(tok_low):
+                lemmatized.append(lems_dict[tok_low])
             else:
                 lemmatized.append(tok_low)
                 
-        return lemmatized
+        return lemmatized 
     
     def strip_garbage(self, lemmatized_legend_test):
         """ Usuwa z listy słów zlematyzowanych, słowa-śmieci, np. 'haha',

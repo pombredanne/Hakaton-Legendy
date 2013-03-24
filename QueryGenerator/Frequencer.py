@@ -1,8 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-__author__="Bartosz Kosowski"
-__date__ ="$March 23, 2012"
+__author__ = "Bartosz Kosowski"
+__date__ = "$March 23, 2012"
 
 """ Do wczytania pliku w utf-8 """
 import codecs
@@ -30,8 +30,8 @@ class Frequencer:
         
         for line in self.frequencies_file:
             line = line.strip()
-            if line =='' or len(line) == 0:
-                 break #koniec pliku
+            if line == '' or len(line) == 0:
+                 break  # koniec pliku
             else:
                 parts = line.split(" ")
                 word = parts[0]
@@ -40,7 +40,7 @@ class Frequencer:
                     num = int(parts[1])
                     freqs[word] = num
                 except ValueError:
-                    sys.stderr.write("ERROR: empty line.\n")
+                    sys.stderr.write("Frequencer error: empty line. Moving on...\n")
             
         return freqs
         
