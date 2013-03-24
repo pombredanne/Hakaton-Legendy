@@ -15,7 +15,7 @@ from Frequencer import Frequencer
 frequencer = Frequencer()    
 
 class FrequencerTest(unittest.TestCase):
-    """ Testy do generatora zapytań. """
+    """ Testy do wyciągacza frekwencji """
     
 
     def testSimpleA(self):

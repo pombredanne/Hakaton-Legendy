@@ -46,7 +46,7 @@ class Frequencer:
         
     def get_frequencies(self, tokens):
         """
-        
+        Podaje słownik frekwencji dla tokenów.
         """
             
         freqs = dict()
