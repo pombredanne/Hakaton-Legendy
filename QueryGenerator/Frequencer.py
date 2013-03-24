@@ -17,7 +17,7 @@ class Frequencer:
     
     def __init__(self):
         """ Konstruktor """
-        file_name = os.path.abspath('dictionaries/frequencies2.txt')
+        file_name = os.path.abspath('dictionaries/frequencies.txt')
         self.frequencies_file = codecs.open(file_name, 'r', 'utf-8')
         self.frequencies = self.build_dictionary()
         
