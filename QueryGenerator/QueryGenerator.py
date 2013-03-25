@@ -32,15 +32,13 @@ from Lemmatizer import Lemmatizer
 class QueryGenerator:
     """ Generuje zbiór zapytań na podstawie tekstu legendy. """
     
-    def __init__(self, lemmas):
+    def __init__(self):
         """Konstruktor. 
             frequencies to słownik {słowo : liczba} częstości występowania
             słów w języku polskim. 
-            lemmas to słownik {słowo : słowo_w_postaci_podstawowej}, czyli
-            mapowanie ze słów do 'lemów'. """
+        """
         self.frequencer = Frequencer()
         self.lemmatizer = Lemmatizer()
-        self.lemmas = lemmas
             
         self.garbage_words = self.generate_list_of_garbage_words()
         

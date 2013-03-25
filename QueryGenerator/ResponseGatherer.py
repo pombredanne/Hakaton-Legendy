@@ -29,8 +29,37 @@ class ResponseGatherer:
         query1 = " ".join(list_of_queries[0])
         
         """ Odpytaj Blekko """
-        res_blekko = get_results_blekko(query1)
+        res_blekko = self.get_results_blekko(query1)
         
+        """ Odpytaj DuckDuckGo """
+        res_duck = self.get_results_duckduckgo(query1)
+        
+        """ Posortuj wyniki """
+        results_sorted = self.sort_results(res_blekko, res_duck)
+        
+        return results_sorted
+        
+        
+    def sort_results(self, resultsA, resultsB):
+        """ Sortuje wyniki w odpowiedni sposób. """
+        
+        results = []
+        
+        """ Liczba list z wynikami / argumentów metody. """
+        num_of_lists = 2
+        
+        indexA = 0
+        indexB = 0
+        
+        for i in range(max((len(resultsA), len(resultsB)))):
+            if num_of_lists % (i + 1) and indexA < len(resultsA):
+                results.append(resultsA[indexA])
+                indexA = indexA + 1
+            elif num_of_lists % (i + 2) and indexB < len(resultsB):
+                results.append(resultsB[indexB])
+                indexB = indexB + 1
+        
+        return results
         
     def get_results_duckduckgo(self, query):
         """
