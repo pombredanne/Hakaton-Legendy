@@ -12,19 +12,7 @@ Testuje działanie generatora zapytań.
 
 from QueryGenerator import QueryGenerator
 
-lemmas = {u'kosmici' : u'kosmita',
-                u'ma' : u'mieć',
-                  u'podaj' : u'podać',
-                  u'herbatę' : u'herbata',
-                  u'mi' : u'ja',
-                  u'studenci' : u'student',
-                  u'studencie' : u'student',
-                  u'moja' : u'moje',
-                  u'ma' : u'mieć',
-                  u'powiedziała' : u'powiedzieć'
-        }
-
-generator = QueryGenerator(lemmas)
+generator = QueryGenerator()
 
 class QueryGeneratorTest(unittest.TestCase):
     """ Testy do generatora zapytań. """
