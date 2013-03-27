@@ -4,8 +4,8 @@
 __author__ = "Bartosz Kosowski"
 __date__ = "$March 27, 2013"
 
-""" Dla funkcji 'sleep' """
-import time
+# """ Dla funkcji 'sleep' """
+# import time
 
 """ Schemat struktury odpowiedzi """
 from Responses import Response
@@ -28,19 +28,20 @@ class ResponseGatherer:
         Pobiera z wyszukiwarek linki stanowiące odpowiedź za zapytania.
         """
         
-        """ Pierwsze zapytanie """
-        query1 = " ".join(list_of_queries[0])
+        list_of_lists_of_results = []
         
-        """ Odpytaj Blekko """
-        res_blekko = self.get_results_blekko(query1)
-        
-        """ Odpytaj DuckDuckGo """
-        res_duck = self.get_results_duckduckgo(query1)
+        for i in range(len(list_of_queries)):
+            query = list_of_queries[i]
+            query_string = " ".join(query)
+            
+            results_blekko = self.get_results_blekko(query_string)
+            list_of_lists_of_results.append(results_blekko)
+            
+            results_duck = self.get_results_duckduckgo(query_string)
+            list_of_lists_of_results.append(results_duck)
         
         """ Posortuj wyniki """
-        list_of_lists_of_of_results = \
-            [res_blekko, res_duck]
-        results_sorted = self.sort_results(list_of_lists_of_of_results)
+        results_sorted = self.sort_results(list_of_lists_of_results)
         
         return results_sorted
         
@@ -98,9 +99,18 @@ class ResponseGatherer:
             res = self.blekko_api.query(query)
             for result in res:
                 response = Response()
-                response.url_title = result.url_title
-                response.url = result.url
-                response.snippet = result.snippet
+                try:
+                    response.url_title = result.url_title
+                except KeyError:
+                    self._dirty_hack_()
+                try:
+                    response.url = result.url
+                except KeyError:
+                    self._dirty_hack_()
+                try:
+                    response.snippet = result.snippet
+                except KeyError:
+                    self._dirty_hack_()
                 response.engine = "Blekko"
                 results.append(response)
                     
@@ -109,3 +119,6 @@ class ResponseGatherer:
             return None
         
         return results
+    
+    def _dirty_hack_(self):
+        return True

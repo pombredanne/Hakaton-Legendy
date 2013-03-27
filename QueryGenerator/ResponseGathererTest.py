@@ -51,6 +51,8 @@ class ResponseGathererTest(unittest.TestCase):
         print "\nResults: "
         print_results_list(results)
         
+        self.failUnless(len(results) > 0)
+        
 
 if __name__ == '__main__':
     unittest.main()
