@@ -64,6 +64,7 @@ class QueryGeneratorTest(unittest.TestCase):
                           u'dużo', u'lat', u'hola', u'powiedzieć',
                           u'babcia', u'ja']
         
+
         lemmatized_gen = generator.lemmatise(tokens)
         
         self.failUnlessEqual(lemmatized_ref, lemmatized_gen)

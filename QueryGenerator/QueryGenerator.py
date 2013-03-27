@@ -50,19 +50,25 @@ class QueryGenerator:
         """ Sprowadza tekst legendy do postaci zlematyzowanej. 
             legend_toks_list to lista tokenów legendy. """
         
-        lems_dict = self.lemmatizer.get_lems(legend_toks_list)
-        
+        #lems_dict = self.lemmatizer.get_lems(legend_toks_list)
+        lems_dict = self.lemmatizer
         lemmatized = []
         
         for token in legend_toks_list:
             tok_low = token.lower()
+            lems_dict.znajdz(tok_low)
+
+            '''
             if lems_dict.has_key(tok_low):
                 lemmatized.append(lems_dict[tok_low])
             else:
                 lemmatized.append(tok_low)
-                
-        return lemmatized 
+            '''
+        #lemmatized = lems_dict.get_lems() 
+        #return lemmatized 
+        return lems_dict.get_lems()
     
+
     def strip_garbage(self, lemmatized_legend_test):
         """ Usuwa z listy słów zlematyzowanych, słowa-śmieci, np. 'haha',
         'hehe', 'historia', 'prawdziwa', czyli takie, które pojawiają
