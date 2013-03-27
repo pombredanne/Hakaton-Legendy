@@ -2,7 +2,10 @@
 # -*- coding: utf-8 -*-
 
 __author__ = "Bartosz Kosowski"
-__date__ = "$March 24, 2013"
+__date__ = "$March 27, 2013"
+
+""" Dla funkcji 'sleep' """
+import time
 
 """ Schemat struktury odpowiedzi """
 from Responses import Response
@@ -18,7 +21,7 @@ class ResponseGatherer:
     
     def __init__(self):
         """ Konstruktor """
-        self.blekko_api = blekko.Blekko(source='my_api_key') # Trzeba uzupełnić
+        self.blekko_api = blekko.Blekko(source='my_api_key')  # Trzeba uzupełnić
         
     def get_results(self, list_of_queries):
         """
@@ -35,29 +38,37 @@ class ResponseGatherer:
         res_duck = self.get_results_duckduckgo(query1)
         
         """ Posortuj wyniki """
-        results_sorted = self.sort_results(res_blekko, res_duck)
+        list_of_lists_of_of_results = \
+            [res_blekko, res_duck]
+        results_sorted = self.sort_results(list_of_lists_of_of_results)
         
         return results_sorted
         
         
-    def sort_results(self, resultsA, resultsB):
-        """ Sortuje wyniki w odpowiedni sposób. """
+    def sort_results(self, list_of_lists_of_of_results):
+        """
+        Sortuje wyniki w odpowiedni sposób.
+        Argument list_of_lists_of_of_results jest listą, której
+        elementami są listy, których elementami są wyniki
+        (url, tytuł, ...; czyli obiekty Response z modułu
+        Responses) wyszukiwania.
+        """
         
         results = []
         
-        """ Liczba list z wynikami / argumentów metody. """
-        num_of_lists = 2
+        """ Liczba list z wynikami """
+        num_of_lists = len(list_of_lists_of_of_results)
         
-        indexA = 0
-        indexB = 0
+        """ Aktualne indeksy dla każdej listy. """
+        indexes = [0 for i in range(num_of_lists)]
         
-        for i in range(max((len(resultsA), len(resultsB)))):
-            if num_of_lists % (i + 1) and indexA < len(resultsA):
-                results.append(resultsA[indexA])
-                indexA = indexA + 1
-            elif num_of_lists % (i + 2) and indexB < len(resultsB):
-                results.append(resultsB[indexB])
-                indexB = indexB + 1
+        # print "\nNumber of indexes: %d" % indexes
+        
+        for i in range(num_of_lists):
+            list = list_of_lists_of_of_results[i]
+            if indexes[i] < len(list):
+                results.append(list[indexes[i]])
+                indexes[i] = indexes[i] + 1
         
         return results
         
@@ -94,7 +105,7 @@ class ResponseGatherer:
                 results.append(response)
                     
         except blekko.BlekkoError as exc:
-            print >>sys.stderr, str(exc)
+            print >> sys.stderr, str(exc)
             return None
         
         return results

@@ -18,5 +18,5 @@ class Response:
         """ Konstruktor """
         self.url_title = ""
         self.url = ""
-        self.snippet - ""
+        self.snippet = ""
         self.engine = ""
