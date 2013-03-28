@@ -7,6 +7,9 @@ __date__ = "$March 27, 2013"
 # """ Dla funkcji 'sleep' """
 # import time
 
+import urllib2
+import requests
+
 """ Schemat struktury odpowiedzi """
 from Responses import Response
 
@@ -21,29 +24,27 @@ class ResponseGatherer:
     
     def __init__(self):
         """ Konstruktor """
-        self.blekko_api = blekko.Blekko(source='my_api_key')  # Trzeba uzupełnić
+        self.bing_key = 'ffCq52T+iRuKYD5P6rgbQDwDivKj6H0bBSqlmecl4AA='
         
     def get_results(self, list_of_queries):
         """
         Pobiera z wyszukiwarek linki stanowiące odpowiedź za zapytania.
         """
         
-        list_of_lists_of_results = []
         
         for i in range(len(list_of_queries)):
             query = list_of_queries[i]
-            query_string = " ".join(query)
+            query_string = "".join(query)
             
             results_blekko = self.get_results_blekko(query_string)
-            list_of_lists_of_results.append(results_blekko)
+            #list_of_lists_of_results.append(results_blekko)
             
-            results_duck = self.get_results_duckduckgo(query_string)
-            list_of_lists_of_results.append(results_duck)
+            #results_duck = self.get_results_duckduckgo(query_string)
+            #list_of_lists_of_results.append(results_duck)
         
         """ Posortuj wyniki """
-        results_sorted = self.sort_results(list_of_lists_of_results)
         
-        return results_sorted
+        return results_blekko
         
         
     def sort_results(self, list_of_lists_of_of_results):
@@ -95,30 +96,27 @@ class ResponseGatherer:
         
     def get_results_blekko(self, query):
         results = []
-        try:
-            res = self.blekko_api.query(query)
-            for result in res:
-                response = Response()
-                try:
-                    response.url_title = result.url_title
-                except KeyError:
-                    self._dirty_hack_()
-                try:
-                    response.url = result.url
-                except KeyError:
-                    self._dirty_hack_()
-                try:
-                    response.snippet = result.snippet
-                except KeyError:
-                    self._dirty_hack_()
-                response.engine = "Blekko"
-                results.append(response)
-                    
-        except blekko.BlekkoError as exc:
-            print >> sys.stderr, str(exc)
-            return None
+        URL = "https://api.datamarket.azure.com/Data.ashx/Bing/SearchWeb/Web?Query='%(query)s'&$top=10&$format=json"
+        r = requests.get(URL % {'query': urllib2.quote(query)}, auth=('', 'ffCq52T+iRuKYD5P6rgbQDwDivKj6H0bBSqlmecl4AA='))
         
+        #print "\nDuckDuckGo result type: %s\n" % r.type 
+        for i in r.json()['d']['results']:
+            response = Response()
+            response.url = str(i['Url'].encode('utf-8'))
+            response.url_title = str(i['Title'].encode('utf-8'))
+            results.append(response)
+
         return results
     
     def _dirty_hack_(self):
         return True
+
+
+lista = [u'czerwony', u'kapturek']
+response_gatherer = ResponseGatherer()
+
+resultaty = response_gatherer.get_results(lista)
+
+for result in resultaty:
+    print result.url
+    print result.url_title

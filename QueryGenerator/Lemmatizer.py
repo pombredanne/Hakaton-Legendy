@@ -10,18 +10,19 @@ class Lemmatizer:
     """Konstruktor"""
     def __init__(self):
         
-        self.lems = dict()
+        self.lems = list()
 
 
     """Znajduje forme podstawową argumentu słowo"""
     def znajdz(self, slowo):
+        slowko = " "+slowo+", "
         self.searchfile = codecs.open(self.file_name, 'r', 'utf-8')
         for line in self.searchfile:
-            if slowo in line:
+            if slowko in line:
                 words = line.split()
                 tempik = words[0]
                 podst = tempik.replace(",", "")
-                self.lems[slowo] = podst
+                self.lems.append(podst)
                 break
         self.searchfile.close()
 
@@ -32,9 +33,9 @@ class Lemmatizer:
 lemmaitzed = []
 
 lemik = Lemmatizer()
-lemik.znajdz(" babijami, ")
-lemik.znajdz(" ma, ")
+lemik.znajdz("babijami")
+lemik.znajdz("moje")
 
 
 print lemik.get_lems()
-print u'mie\u0107'.encode('utf-8')
+print u'ma\u0142o'.encode('utf-8')
