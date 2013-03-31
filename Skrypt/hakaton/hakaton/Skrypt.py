@@ -84,3 +84,6 @@ def tokenizuj(legend):
 
 
 #legend = unicode('tutaj będzie tekst legendy', "UTF-8")
+
+def wyszukaj(ile_slow):
+    pass
