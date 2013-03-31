@@ -1,53 +1,28 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+import re
+import os
+import codecs
 
-import urllib2
-import requests
+file_name = os.path.abspath('dictionaries/slownik_lemm.txt')
+searchfile = codecs.open(file_name, 'r', 'utf-8')
 
-from Responses import Response
+legend = unicode('Kolega raz mi opowiadał jak u niego na wsi łepki po 19 lat dorwali BMW (niewiem z którego roku dokładnie). Okres zimowy, auto zapakowane pięcioma osobnikami w dresach,', "UTF-8")
 
+re_word = re.compile(r'(\w+)', re.UNICODE)
+words = []
+for word in re.findall(re_word, legend):
+	words.append(word.lower())
 
+for i in words:
+	print i.encode('utf-8')
 
-# note the single quotes surrounding the query 
-URL = "https://api.datamarket.azure.com/Data.ashx/Bing/SearchWeb/Web?Query='%(query)s'&$top=10&$format=json"
-chuj = "\u015bl\u0119czy"
-query = u"\u015bl\u0119czy".encode('utf-8')
-
-# query == 'affirmative%2Baction'
-r = requests.get(URL % {'query': urllib2.quote(query)}, auth=('', 'ffCq52T+iRuKYD5P6rgbQDwDivKj6H0bBSqlmecl4AA='))
-
-#print r.json()['d']['results']
-
-response = Response()
-
-count = 0
+words_lem = []
 '''
-while (count<10):
-	print str(r.json()['d']['results'].encode('utf-8', 'ignore'))
-	count = count + 1
-'''
-results = []
-#for result in r.results:
-for i in r.json()['d']['results']:
-	response = Response()
-	response.url = str(i['Url'].encode('utf-8'))
-	response.url_title = str(i['Title'].encode('utf-8'))
-	results.append(response)
+for wordlem in re.search(re_word, self.searchfile):
+	words
 
-for result in results:
-	i = result.url
-	j = result.url_title
-	print i
-	print j
 '''
-#while(count<10):
-for i in r.json()['d']['results']:
-	#response.url = str(i['Url'].encode('utf-8'))
-	#response.url_title = str(i['Title'].encode('utf-8'))
-	print str(i['Url'].encode('utf-8', 'ignore')) + '\\' + str(i['Title'].encode('utf-8', 'ignore'))
-		#count = count + 1
-	
-'''
-#print response.url
-#print response.url_title
+with open("slownik_lemm.txt", "r") as myfile:
+    data=myfile.read().replace('\n', '')
