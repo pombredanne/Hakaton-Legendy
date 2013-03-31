@@ -8,7 +8,7 @@ from pprint import pprint
 
 def tokenizuj(legend):
     
-    file_name = os.path.abspath('slownik_lemm.txt')
+    #file_name = os.path.abspath('slownik_lemm.txt')
 
     '''Ładowanie słownika lemów do listy, by szybciej działało '''
     data = []
@@ -57,15 +57,12 @@ def tokenizuj(legend):
             continue
         elif freqs_dict.get(i) < maximum and freqs_dict.get(i) > minimum:
             cleaned_words_list.append(i)
-    #pprint(words)
 
-    for i in cleaned_words_list:
-        print i.encode('utf-8')
-
-
+    return len(cleaned_words_list)
 
     '''
-
+    for i in cleaned_words_list:
+        print i.encode('utf-8')
 
     #Lematyzowanie zmiennej slowo w liście data
 
@@ -86,4 +83,4 @@ def tokenizuj(legend):
     #print data[0].encode('utf-8')
 
 
-legend = unicode('tutaj będzie tekst legendy', "UTF-8")
+#legend = unicode('tutaj będzie tekst legendy', "UTF-8")
