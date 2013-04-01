@@ -1,89 +1,100 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+from BeautifulSoup import BeautifulSoup
+import urllib
 import re
-import os
+import requests
 import codecs
-from pprint import pprint
+import urllib2
+import simplejson
 
-def tokenizuj(legend):
-    
-    #file_name = os.path.abspath('slownik_lemm.txt')
+class Skrypt:
 
-    '''Ładowanie słownika lemów do listy, by szybciej działało '''
-    data = []
-    with codecs.open('slownik_lemm.txt', 'r', 'utf-8') as myfile:
-        for line in myfile:
-            data.append(line.rstrip())
-    myfile.close()
+    def __init__(self):
+        self.freqs_dict = dict()
+        self.words = list()
+        self.cleaned_words_list = list()
 
-    ''' Tworzenie słownika frekwencji słów. W przypadku duplikatów w pliku, leć dalej. '''
-    freqs_dict = dict()
-    with codecs.open('frequencies.txt', 'r', 'utf-8') as freq_file:
-        for line in freq_file:
-            line1 = line.strip()
-            parts = line.split()
-            freq_word = parts[0]
-            freq_num = int(parts[1])
-            if freq_word in freqs_dict:
+    def tokenise(self, legend):
+        #legend = unicode(raw_legend, 'UTF-8')
+
+        ''' Tworzenie słownika frekwencji słów. W przypadku duplikatów w pliku, leć dalej. '''
+        
+        with codecs.open('hakaton/frequencies.txt', 'r', 'utf-8') as freq_file:
+            for line in freq_file:
+                parts = line.split()
+                freq_word = parts[0]
+                freq_num = int(parts[1])
+                if freq_word in self.freqs_dict:
+                    continue
+                else:
+                    self.freqs_dict[freq_word] = freq_num
+        freq_file.close()
+
+
+        '''Rozwalenie tekstu legendy na slowa do listy '''
+        re_word = re.compile(r'(\w+)', re.UNICODE)
+        for word in re.findall(re_word, legend):
+            self.words.append(word.lower())
+
+        ''' Usunięcie tych słów z listy words, których frekwencja przekracza 'maximum' '''
+
+        maximum = 300
+        minimum = 70
+        
+        for i in self.words:
+            if i not in self.freqs_dict:
                 continue
-            else:
-                freqs_dict[freq_word] = freq_num
-    freq_file.close()
+            elif self.freqs_dict.get(i) > maximum:
+                continue
+            elif self.freqs_dict.get(i) < maximum and self.freqs_dict.get(i) > minimum:
+                self.cleaned_words_list.append(i)
+        return len(self.cleaned_words_list)
 
 
-    '''Rozwalenie tekstu legendy na slowa do listy '''
-    re_word = re.compile(r'(\w+)', re.UNICODE)
-    words = []
-    for word in re.findall(re_word, legend):
-        words.append(word.lower())
 
-    #for i in words:
-    #    print i.encode('utf-8')
-    #pprint(freqs_dict)
-    #print freqs_dict.get('nic')
 
-    ''' Usunięcie tych słów z listy words, których frekwencja przekracza 'maximum' '''
 
-    maximum = 300
-    minimum = 70
+    def searchIt(self, how_many_words):
 
-    cleaned_words_list = []
+        ''' Tworzenie napisu do zapytania, w zaleznosci od argumentu how_many_words '''
+        iterator = int(how_many_words)
+        query = "legenda miejska ".encode('utf-8') #mały haczyk dodatkowy
+        for i in xrange(iterator):
+            query = query + self.cleaned_words_list[i].encode('utf-8') + " "
+        results = list()
 
-    for i in words:
-        if i not in freqs_dict:
-            continue
-        elif freqs_dict.get(i) > maximum:
-            continue
-        elif freqs_dict.get(i) < maximum and freqs_dict.get(i) > minimum:
-            cleaned_words_list.append(i)
+        ''' Implementacja poszczególnych wyszukiwarek '''
 
-    return len(cleaned_words_list)
+        #Bing
+        URL = "https://api.datamarket.azure.com/Data.ashx/Bing/SearchWeb/Web?Query='%(query)s'&$top=10&$format=json"
+        r = requests.get(URL % {'query': urllib2.quote(query)}, auth=('', 'ffCq52T+iRuKYD5P6rgbQDwDivKj6H0bBSqlmecl4AA='))
+        for i in r.json()['d']['results']:
+            bing_result_url = str(i['Url'].encode('utf-8'))
+            results.append(bing_result_url)
 
-    '''
-    for i in cleaned_words_list:
-        print i.encode('utf-8')
+        #DuckDuckGo
+        siteDuck = urllib.urlopen("http://duckduckgo.com/html/?q=%s"%query)
+        data = siteDuck.read()
+        parsed = BeautifulSoup(data)
 
-    #Lematyzowanie zmiennej slowo w liście data
-
-    words_lem = []
-    for _word in words:
-        re_lemik = re.compile(r'\b%s\b'%_word, re.UNICODE)
-        for line in data:
-            if re_lemik.search(line):
-                lematyzowane = line.split()
-                words_lem.append(lematyzowane[0])
+        extr = 10
+        for i in parsed.findAll('div', {'class': re.compile('links_main*')}):
+            if extr is 0:
                 break
+            else:
+                extr = extr - 1
+                duck_result_url = str(i.a['href'].encode('utf-8'))
+                results.append(duck_result_url)
 
-    for i in words_lem:
-        print i.encode('utf-8')
-    '''
+        #Google
+        url = "http://ajax.googleapis.com/ajax/services/search/web?v=1.0&%s"%urllib.urlencode({'q' : query})
+        search_results = urllib.urlopen(url)
+        json = simplejson.loads(search_results.read())
+        json_results = json['responseData']['results']
+        for i in json_results:
+            google_url_result = i['url']
+            results.append(google_url_result)
 
-    #print words_lem[0].encode('utf-8')
-    #print data[0].encode('utf-8')
-
-
-#legend = unicode('tutaj będzie tekst legendy', "UTF-8")
-
-def wyszukaj(ile_slow):
-    pass
+        return results
