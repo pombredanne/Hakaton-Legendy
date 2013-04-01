@@ -19,19 +19,18 @@ def SearchLegend(request):
         try:
             if int(yourValue)<=int(maxValue):
                 listaWynikowWyszukiwania = skrypt.searchIt(yourValue)
-                wynik += u"<br /><b>Wyniki wyszukiwania dla:<br /></b><span style=\"color: gray;\"><i>%s</i></span><br />" %tekstLegendy
-                #wynik += "debug-MAX%s" %maxValue
+                wynik += u"<br /><b>Wyniki wyszukiwania (na podstawie tokenów mocy <b>%s</b>) dla:<br /></b><span style=\"color: gray;\"><i>%s</i></span><br />" %(yourValue,tekstLegendy)
                 for k in listaWynikowWyszukiwania:
                     wynik += u"<ul><li><a href=\"%s\">%s</a></li></ul>" %(k, k)
             else:
                 listaWynikowWyszukiwania = skrypt.searchIt(maxValue)
-                wynik += u"<br /><b>Wyniki wyszukiwania dla:<br /></b><span style=\"color: gray;\"><i>%s</i></span><br />" %tekstLegendy
+                wynik += u"<br /><b>Wyniki wyszukiwania (na podstawie tokenów mocy <b>%s</b>) dla:<br /></b><span style=\"color: gray;\"><i>%s</i></span><br />" %(maxValue,tekstLegendy)
                 #wynik += "debug-MAX%s" %maxValue
                 for k in listaWynikowWyszukiwania:
                     wynik += u"<ul><li><a href=\"%s\">%s</a></li></ul>" %(k, k)                
         except ValueError:
             listaWynikowWyszukiwania = skrypt.searchIt(maxValue)
-            wynik += u"<br /><b>Wyniki wyszukiwania dla:<br /></b><span style=\"color: gray;\"><i>%s</i></span><br />" %tekstLegendy
+            wynik += u"<br /><b>Wyniki wyszukiwania (na podstawie tokenów mocy <b>%s</b>) dla:<br /></b><span style=\"color: gray;\"><i>%s</i></span><br />" %(maxValue,tekstLegendy)
             #wynik += "debug-MAX%s" %maxValue
             for k in listaWynikowWyszukiwania:
                 wynik += u"<ul><li><a href=\"%s\">%s</a></li></ul>" %(k, k)
